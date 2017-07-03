@@ -11,7 +11,6 @@ import (
 
 	"github.com/hashicorp/consul/agent/consul/state"
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/lib"
 	"github.com/hashicorp/consul/types"
 	"github.com/hashicorp/go-uuid"
@@ -118,7 +117,7 @@ func TestFSM_RegisterNode_Service(t *testing.T) {
 			Node:      "foo",
 			CheckID:   "db",
 			Name:      "db connectivity",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 			ServiceID: "db",
 		},
 	}
@@ -237,7 +236,7 @@ func TestFSM_DeregisterCheck(t *testing.T) {
 			Node:    "foo",
 			CheckID: "mem",
 			Name:    "memory util",
-			Status:  api.HealthPassing,
+			Status:  structs.HealthPassing,
 		},
 	}
 	buf, err := structs.Encode(structs.RegisterRequestType, req)
@@ -305,7 +304,7 @@ func TestFSM_DeregisterNode(t *testing.T) {
 			Node:      "foo",
 			CheckID:   "db",
 			Name:      "db connectivity",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 			ServiceID: "db",
 		},
 	}
@@ -379,7 +378,7 @@ func TestFSM_SnapshotRestore(t *testing.T) {
 		Node:      "foo",
 		CheckID:   "web",
 		Name:      "web connectivity",
-		Status:    api.HealthPassing,
+		Status:    structs.HealthPassing,
 		ServiceID: "web",
 	})
 	fsm.state.KVSSet(8, &structs.DirEntry{
@@ -667,7 +666,7 @@ func TestFSM_KVSDelete(t *testing.T) {
 
 	req := structs.KVSRequest{
 		Datacenter: "dc1",
-		Op:         api.KVSet,
+		Op:         structs.KVSet,
 		DirEnt: structs.DirEntry{
 			Key:   "/test/path",
 			Flags: 0,
@@ -684,7 +683,7 @@ func TestFSM_KVSDelete(t *testing.T) {
 	}
 
 	// Run the delete
-	req.Op = api.KVDelete
+	req.Op = structs.KVDelete
 	buf, err = structs.Encode(structs.KVSRequestType, req)
 	if err != nil {
 		t.Fatalf("err: %v", err)
@@ -713,7 +712,7 @@ func TestFSM_KVSDeleteTree(t *testing.T) {
 
 	req := structs.KVSRequest{
 		Datacenter: "dc1",
-		Op:         api.KVSet,
+		Op:         structs.KVSet,
 		DirEnt: structs.DirEntry{
 			Key:   "/test/path",
 			Flags: 0,
@@ -730,7 +729,7 @@ func TestFSM_KVSDeleteTree(t *testing.T) {
 	}
 
 	// Run the delete tree
-	req.Op = api.KVDeleteTree
+	req.Op = structs.KVDeleteTree
 	req.DirEnt.Key = "/test"
 	buf, err = structs.Encode(structs.KVSRequestType, req)
 	if err != nil {
@@ -760,7 +759,7 @@ func TestFSM_KVSDeleteCheckAndSet(t *testing.T) {
 
 	req := structs.KVSRequest{
 		Datacenter: "dc1",
-		Op:         api.KVSet,
+		Op:         structs.KVSet,
 		DirEnt: structs.DirEntry{
 			Key:   "/test/path",
 			Flags: 0,
@@ -786,7 +785,7 @@ func TestFSM_KVSDeleteCheckAndSet(t *testing.T) {
 	}
 
 	// Run the check-and-set
-	req.Op = api.KVDeleteCAS
+	req.Op = structs.KVDeleteCAS
 	req.DirEnt.ModifyIndex = d.ModifyIndex
 	buf, err = structs.Encode(structs.KVSRequestType, req)
 	if err != nil {
@@ -816,7 +815,7 @@ func TestFSM_KVSCheckAndSet(t *testing.T) {
 
 	req := structs.KVSRequest{
 		Datacenter: "dc1",
-		Op:         api.KVSet,
+		Op:         structs.KVSet,
 		DirEnt: structs.DirEntry{
 			Key:   "/test/path",
 			Flags: 0,
@@ -842,7 +841,7 @@ func TestFSM_KVSCheckAndSet(t *testing.T) {
 	}
 
 	// Run the check-and-set
-	req.Op = api.KVCAS
+	req.Op = structs.KVCAS
 	req.DirEnt.ModifyIndex = d.ModifyIndex
 	req.DirEnt.Value = []byte("zip")
 	buf, err = structs.Encode(structs.KVSRequestType, req)
@@ -916,7 +915,7 @@ func TestFSM_SessionCreate_Destroy(t *testing.T) {
 	fsm.state.EnsureCheck(2, &structs.HealthCheck{
 		Node:    "foo",
 		CheckID: "web",
-		Status:  api.HealthPassing,
+		Status:  structs.HealthPassing,
 	})
 
 	// Create a new session
@@ -998,7 +997,7 @@ func TestFSM_KVSLock(t *testing.T) {
 
 	req := structs.KVSRequest{
 		Datacenter: "dc1",
-		Op:         api.KVLock,
+		Op:         structs.KVLock,
 		DirEnt: structs.DirEntry{
 			Key:     "/test/path",
 			Value:   []byte("test"),
@@ -1043,7 +1042,7 @@ func TestFSM_KVSUnlock(t *testing.T) {
 
 	req := structs.KVSRequest{
 		Datacenter: "dc1",
-		Op:         api.KVLock,
+		Op:         structs.KVLock,
 		DirEnt: structs.DirEntry{
 			Key:     "/test/path",
 			Value:   []byte("test"),
@@ -1061,7 +1060,7 @@ func TestFSM_KVSUnlock(t *testing.T) {
 
 	req = structs.KVSRequest{
 		Datacenter: "dc1",
-		Op:         api.KVUnlock,
+		Op:         structs.KVUnlock,
 		DirEnt: structs.DirEntry{
 			Key:     "/test/path",
 			Value:   []byte("test"),
@@ -1325,7 +1324,7 @@ func TestFSM_Txn(t *testing.T) {
 		Ops: structs.TxnOps{
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVSet,
+					Verb: structs.KVSet,
 					DirEnt: structs.DirEntry{
 						Key:   "/test/path",
 						Flags: 0,

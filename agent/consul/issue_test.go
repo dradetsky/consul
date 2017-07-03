@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 )
 
 // Testing for GH-300 and GH-279
@@ -30,7 +29,7 @@ func TestHealthCheckRace(t *testing.T) {
 			Node:      "foo",
 			CheckID:   "db",
 			Name:      "db connectivity",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 			ServiceID: "db",
 		},
 	}
@@ -56,7 +55,7 @@ func TestHealthCheckRace(t *testing.T) {
 	}
 
 	// Update the check state
-	req.Check.Status = api.HealthCritical
+	req.Check.Status = structs.HealthCritical
 	buf, err = structs.Encode(structs.RegisterRequestType, req)
 	if err != nil {
 		t.Fatalf("err: %v", err)

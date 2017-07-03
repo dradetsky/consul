@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/testrpc"
 	"github.com/hashicorp/net-rpc-msgpackrpc"
 )
@@ -35,7 +34,7 @@ func TestTxn_CheckNotExists(t *testing.T) {
 		Ops: structs.TxnOps{
 			{
 				KV: &structs.TxnKVOp{
-					Verb:   api.KVCheckNotExists,
+					Verb:   structs.KVCheckNotExists,
 					DirEnt: structs.DirEntry{Key: "test"},
 				},
 			},
@@ -47,7 +46,7 @@ func TestTxn_CheckNotExists(t *testing.T) {
 		Ops: structs.TxnOps{
 			{
 				KV: &structs.TxnKVOp{
-					Verb:   api.KVSet,
+					Verb:   structs.KVSet,
 					DirEnt: structs.DirEntry{Key: "test"},
 				},
 			},
@@ -84,7 +83,7 @@ func TestTxn_Apply(t *testing.T) {
 		Ops: structs.TxnOps{
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVSet,
+					Verb: structs.KVSet,
 					DirEnt: structs.DirEntry{
 						Key:   "test",
 						Flags: 42,
@@ -94,7 +93,7 @@ func TestTxn_Apply(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVGet,
+					Verb: structs.KVGet,
 					DirEnt: structs.DirEntry{
 						Key: "test",
 					},
@@ -202,7 +201,7 @@ func TestTxn_Apply_ACLDeny(t *testing.T) {
 		Ops: structs.TxnOps{
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVSet,
+					Verb: structs.KVSet,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -210,7 +209,7 @@ func TestTxn_Apply_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVDelete,
+					Verb: structs.KVDelete,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -218,7 +217,7 @@ func TestTxn_Apply_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVDeleteCAS,
+					Verb: structs.KVDeleteCAS,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -226,7 +225,7 @@ func TestTxn_Apply_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVDeleteTree,
+					Verb: structs.KVDeleteTree,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -234,7 +233,7 @@ func TestTxn_Apply_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVCAS,
+					Verb: structs.KVCAS,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -242,7 +241,7 @@ func TestTxn_Apply_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVLock,
+					Verb: structs.KVLock,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -250,7 +249,7 @@ func TestTxn_Apply_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVUnlock,
+					Verb: structs.KVUnlock,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -258,7 +257,7 @@ func TestTxn_Apply_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVGet,
+					Verb: structs.KVGet,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -266,7 +265,7 @@ func TestTxn_Apply_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVGetTree,
+					Verb: structs.KVGetTree,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -274,7 +273,7 @@ func TestTxn_Apply_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVCheckSession,
+					Verb: structs.KVCheckSession,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -282,7 +281,7 @@ func TestTxn_Apply_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVCheckIndex,
+					Verb: structs.KVCheckIndex,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -290,7 +289,7 @@ func TestTxn_Apply_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVCheckNotExists,
+					Verb: structs.KVCheckNotExists,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -310,7 +309,7 @@ func TestTxn_Apply_ACLDeny(t *testing.T) {
 	var expected structs.TxnResponse
 	for i, op := range arg.Ops {
 		switch op.KV.Verb {
-		case api.KVGet, api.KVGetTree:
+		case structs.KVGet, structs.KVGetTree:
 			// These get filtered but won't result in an error.
 
 		default:
@@ -372,7 +371,7 @@ func TestTxn_Apply_LockDelay(t *testing.T) {
 		Ops: structs.TxnOps{
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVLock,
+					Verb: structs.KVLock,
 					DirEnt: structs.DirEntry{
 						Key:     "test",
 						Session: validID,
@@ -439,7 +438,7 @@ func TestTxn_Read(t *testing.T) {
 		Ops: structs.TxnOps{
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVGet,
+					Verb: structs.KVGet,
 					DirEnt: structs.DirEntry{
 						Key: "test",
 					},
@@ -526,7 +525,7 @@ func TestTxn_Read_ACLDeny(t *testing.T) {
 		Ops: structs.TxnOps{
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVGet,
+					Verb: structs.KVGet,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -534,7 +533,7 @@ func TestTxn_Read_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVGetTree,
+					Verb: structs.KVGetTree,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -542,7 +541,7 @@ func TestTxn_Read_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVCheckSession,
+					Verb: structs.KVCheckSession,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -550,7 +549,7 @@ func TestTxn_Read_ACLDeny(t *testing.T) {
 			},
 			&structs.TxnOp{
 				KV: &structs.TxnKVOp{
-					Verb: api.KVCheckIndex,
+					Verb: structs.KVCheckIndex,
 					DirEnt: structs.DirEntry{
 						Key: "nope",
 					},
@@ -574,7 +573,7 @@ func TestTxn_Read_ACLDeny(t *testing.T) {
 	}
 	for i, op := range arg.Ops {
 		switch op.KV.Verb {
-		case api.KVGet, api.KVGetTree:
+		case structs.KVGet, structs.KVGetTree:
 			// These get filtered but won't result in an error.
 
 		default:

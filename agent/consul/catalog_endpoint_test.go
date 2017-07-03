@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/lib"
 	"github.com/hashicorp/consul/testrpc"
 	"github.com/hashicorp/consul/testutil/retry"
@@ -1691,7 +1690,7 @@ service "foo" {
 			CheckID:   "service:foo",
 			Name:      "service:foo",
 			ServiceID: "foo",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 		},
 		WriteRequest: structs.WriteRequest{Token: "root"},
 	}

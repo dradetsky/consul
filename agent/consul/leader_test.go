@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/testrpc"
 	"github.com/hashicorp/consul/testutil/retry"
 	"github.com/hashicorp/net-rpc-msgpackrpc"
@@ -59,7 +58,7 @@ func TestLeader_RegisterMember(t *testing.T) {
 	if checks[0].Name != SerfCheckName {
 		t.Fatalf("bad check: %v", checks[0])
 	}
-	if checks[0].Status != api.HealthPassing {
+	if checks[0].Status != structs.HealthPassing {
 		t.Fatalf("bad check: %v", checks[0])
 	}
 
@@ -137,7 +136,7 @@ func TestLeader_FailedMember(t *testing.T) {
 		if err != nil {
 			r.Fatalf("err: %v", err)
 		}
-		if got, want := checks[0].Status, api.HealthCritical; got != want {
+		if got, want := checks[0].Status, structs.HealthCritical; got != want {
 			r.Fatalf("got status %q want %q", got, want)
 		}
 	})
@@ -272,7 +271,7 @@ func TestLeader_Reconcile_ReapMember(t *testing.T) {
 			Node:    "no-longer-around",
 			CheckID: SerfCheckID,
 			Name:    SerfCheckName,
-			Status:  api.HealthCritical,
+			Status:  structs.HealthCritical,
 		},
 		WriteRequest: structs.WriteRequest{
 			Token: "root",
@@ -380,7 +379,7 @@ func TestLeader_Reconcile_Races(t *testing.T) {
 			Node:    c1.config.NodeName,
 			CheckID: SerfCheckID,
 			Name:    SerfCheckName,
-			Status:  api.HealthCritical,
+			Status:  structs.HealthCritical,
 			Output:  "",
 		},
 	}
@@ -411,7 +410,7 @@ func TestLeader_Reconcile_Races(t *testing.T) {
 		if err != nil {
 			r.Fatalf("err: %v", err)
 		}
-		if got, want := checks[0].Status, api.HealthCritical; got != want {
+		if got, want := checks[0].Status, structs.HealthCritical; got != want {
 			r.Fatalf("got state %q want %q", got, want)
 		}
 	})
@@ -646,7 +645,7 @@ func TestLeader_ReapTombstones(t *testing.T) {
 	// Create a KV entry
 	arg := structs.KVSRequest{
 		Datacenter: "dc1",
-		Op:         api.KVSet,
+		Op:         structs.KVSet,
 		DirEnt: structs.DirEntry{
 			Key:   "test",
 			Value: []byte("test"),
@@ -661,7 +660,7 @@ func TestLeader_ReapTombstones(t *testing.T) {
 	}
 
 	// Delete the KV entry (tombstoned).
-	arg.Op = api.KVDelete
+	arg.Op = structs.KVDelete
 	if err := msgpackrpc.CallWithCodec(codec, "KVS.Apply", &arg, &out); err != nil {
 		t.Fatalf("err: %v", err)
 	}

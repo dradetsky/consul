@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/testrpc"
 	"github.com/hashicorp/consul/testutil/retry"
 	"github.com/hashicorp/net-rpc-msgpackrpc"
@@ -22,7 +21,7 @@ func verifySnapshot(t *testing.T, s *Server, dc, token string) {
 	{
 		args := structs.KVSRequest{
 			Datacenter: dc,
-			Op:         api.KVSet,
+			Op:         structs.KVSet,
 			DirEnt: structs.DirEntry{
 				Key:   "test",
 				Value: []byte("hello"),
@@ -77,7 +76,7 @@ func verifySnapshot(t *testing.T, s *Server, dc, token string) {
 	{
 		args := structs.KVSRequest{
 			Datacenter: dc,
-			Op:         api.KVSet,
+			Op:         structs.KVSet,
 			DirEnt: structs.DirEntry{
 				Key:   "test",
 				Value: []byte("goodbye"),

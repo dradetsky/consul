@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/lib"
 	"github.com/hashicorp/consul/testrpc"
 	"github.com/hashicorp/net-rpc-msgpackrpc"
@@ -33,7 +32,7 @@ func TestInternal_NodeInfo(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:      "db connect",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 			ServiceID: "db",
 		},
 	}
@@ -61,7 +60,7 @@ func TestInternal_NodeInfo(t *testing.T) {
 	if !lib.StrContains(nodes[0].Services[0].Tags, "master") {
 		t.Fatalf("Bad: %v", nodes[0])
 	}
-	if nodes[0].Checks[0].Status != api.HealthPassing {
+	if nodes[0].Checks[0].Status != structs.HealthPassing {
 		t.Fatalf("Bad: %v", nodes[0])
 	}
 }
@@ -87,7 +86,7 @@ func TestInternal_NodeDump(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:      "db connect",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 			ServiceID: "db",
 		},
 	}
@@ -107,7 +106,7 @@ func TestInternal_NodeDump(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:      "db connect",
-			Status:    api.HealthWarning,
+			Status:    structs.HealthWarning,
 			ServiceID: "db",
 		},
 	}
@@ -136,7 +135,7 @@ func TestInternal_NodeDump(t *testing.T) {
 			if !lib.StrContains(node.Services[0].Tags, "master") {
 				t.Fatalf("Bad: %v", nodes[0])
 			}
-			if node.Checks[0].Status != api.HealthPassing {
+			if node.Checks[0].Status != structs.HealthPassing {
 				t.Fatalf("Bad: %v", nodes[0])
 			}
 
@@ -145,7 +144,7 @@ func TestInternal_NodeDump(t *testing.T) {
 			if !lib.StrContains(node.Services[0].Tags, "slave") {
 				t.Fatalf("Bad: %v", nodes[1])
 			}
-			if node.Checks[0].Status != api.HealthWarning {
+			if node.Checks[0].Status != structs.HealthWarning {
 				t.Fatalf("Bad: %v", nodes[1])
 			}
 

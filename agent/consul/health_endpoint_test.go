@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/lib"
 	"github.com/hashicorp/consul/testrpc"
 	"github.com/hashicorp/net-rpc-msgpackrpc"
@@ -28,7 +27,7 @@ func TestHealth_ChecksInState(t *testing.T) {
 		Address:    "127.0.0.1",
 		Check: &structs.HealthCheck{
 			Name:   "memory utilization",
-			Status: api.HealthPassing,
+			Status: structs.HealthPassing,
 		},
 	}
 	var out struct{}
@@ -39,7 +38,7 @@ func TestHealth_ChecksInState(t *testing.T) {
 	var out2 structs.IndexedHealthChecks
 	inState := structs.ChecksInStateRequest{
 		Datacenter: "dc1",
-		State:      api.HealthPassing,
+		State:      structs.HealthPassing,
 	}
 	if err := msgpackrpc.CallWithCodec(codec, "Health.ChecksInState", &inState, &out2); err != nil {
 		t.Fatalf("err: %v", err)
@@ -79,7 +78,7 @@ func TestHealth_ChecksInState_NodeMetaFilter(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:   "memory utilization",
-			Status: api.HealthPassing,
+			Status: structs.HealthPassing,
 		},
 	}
 	var out struct{}
@@ -95,7 +94,7 @@ func TestHealth_ChecksInState_NodeMetaFilter(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:   "disk space",
-			Status: api.HealthPassing,
+			Status: structs.HealthPassing,
 		},
 	}
 	if err := msgpackrpc.CallWithCodec(codec, "Catalog.Register", &arg, &out); err != nil {
@@ -136,7 +135,7 @@ func TestHealth_ChecksInState_NodeMetaFilter(t *testing.T) {
 		inState := structs.ChecksInStateRequest{
 			Datacenter:      "dc1",
 			NodeMetaFilters: tc.filters,
-			State:           api.HealthPassing,
+			State:           structs.HealthPassing,
 		}
 		if err := msgpackrpc.CallWithCodec(codec, "Health.ChecksInState", &inState, &out); err != nil {
 			t.Fatalf("err: %v", err)
@@ -184,7 +183,7 @@ func TestHealth_ChecksInState_DistanceSort(t *testing.T) {
 		Address:    "127.0.0.1",
 		Check: &structs.HealthCheck{
 			Name:   "memory utilization",
-			Status: api.HealthPassing,
+			Status: structs.HealthPassing,
 		},
 	}
 
@@ -202,7 +201,7 @@ func TestHealth_ChecksInState_DistanceSort(t *testing.T) {
 	var out2 structs.IndexedHealthChecks
 	inState := structs.ChecksInStateRequest{
 		Datacenter: "dc1",
-		State:      api.HealthPassing,
+		State:      structs.HealthPassing,
 		Source: structs.QuerySource{
 			Datacenter: "dc1",
 			Node:       "foo",
@@ -249,7 +248,7 @@ func TestHealth_NodeChecks(t *testing.T) {
 		Address:    "127.0.0.1",
 		Check: &structs.HealthCheck{
 			Name:   "memory utilization",
-			Status: api.HealthPassing,
+			Status: structs.HealthPassing,
 		},
 	}
 	var out struct{}
@@ -295,7 +294,7 @@ func TestHealth_ServiceChecks(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:      "db connect",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 			ServiceID: "db",
 		},
 	}
@@ -346,7 +345,7 @@ func TestHealth_ServiceChecks_NodeMetaFilter(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:      "memory utilization",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 			ServiceID: "db",
 		},
 	}
@@ -367,7 +366,7 @@ func TestHealth_ServiceChecks_NodeMetaFilter(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:      "disk space",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 			ServiceID: "db",
 		},
 	}
@@ -461,7 +460,7 @@ func TestHealth_ServiceChecks_DistanceSort(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:      "db connect",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 			ServiceID: "db",
 		},
 	}
@@ -538,7 +537,7 @@ func TestHealth_ServiceNodes(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:      "db connect",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 			ServiceID: "db",
 		},
 	}
@@ -558,7 +557,7 @@ func TestHealth_ServiceNodes(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:      "db connect",
-			Status:    api.HealthWarning,
+			Status:    structs.HealthWarning,
 			ServiceID: "db",
 		},
 	}
@@ -593,10 +592,10 @@ func TestHealth_ServiceNodes(t *testing.T) {
 	if !lib.StrContains(nodes[1].Service.Tags, "master") {
 		t.Fatalf("Bad: %v", nodes[1])
 	}
-	if nodes[0].Checks[0].Status != api.HealthWarning {
+	if nodes[0].Checks[0].Status != structs.HealthWarning {
 		t.Fatalf("Bad: %v", nodes[0])
 	}
-	if nodes[1].Checks[0].Status != api.HealthPassing {
+	if nodes[1].Checks[0].Status != structs.HealthPassing {
 		t.Fatalf("Bad: %v", nodes[1])
 	}
 }
@@ -625,7 +624,7 @@ func TestHealth_ServiceNodes_NodeMetaFilter(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:      "memory utilization",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 			ServiceID: "db",
 		},
 	}
@@ -647,7 +646,7 @@ func TestHealth_ServiceNodes_NodeMetaFilter(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:      "disk space",
-			Status:    api.HealthWarning,
+			Status:    structs.HealthWarning,
 			ServiceID: "db",
 		},
 	}
@@ -765,7 +764,7 @@ func TestHealth_ServiceNodes_DistanceSort(t *testing.T) {
 		},
 		Check: &structs.HealthCheck{
 			Name:      "db connect",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 			ServiceID: "db",
 		},
 	}
@@ -945,7 +944,7 @@ func TestHealth_ChecksInState_FilterACL(t *testing.T) {
 
 	opt := structs.ChecksInStateRequest{
 		Datacenter:   "dc1",
-		State:        api.HealthPassing,
+		State:        structs.HealthPassing,
 		QueryOptions: structs.QueryOptions{Token: token},
 	}
 	reply := structs.IndexedHealthChecks{}

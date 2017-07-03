@@ -10,7 +10,6 @@ import (
 	"github.com/armon/go-metrics"
 	"github.com/hashicorp/consul/agent/consul/state"
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/go-msgpack/codec"
 	"github.com/hashicorp/raft"
 )
@@ -167,31 +166,31 @@ func (c *consulFSM) applyKVSOperation(buf []byte, index uint64) interface{} {
 	}
 	defer metrics.MeasureSince([]string{"consul", "fsm", "kvs", string(req.Op)}, time.Now())
 	switch req.Op {
-	case api.KVSet:
+	case structs.KVSet:
 		return c.state.KVSSet(index, &req.DirEnt)
-	case api.KVDelete:
+	case structs.KVDelete:
 		return c.state.KVSDelete(index, req.DirEnt.Key)
-	case api.KVDeleteCAS:
+	case structs.KVDeleteCAS:
 		act, err := c.state.KVSDeleteCAS(index, req.DirEnt.ModifyIndex, req.DirEnt.Key)
 		if err != nil {
 			return err
 		}
 		return act
-	case api.KVDeleteTree:
+	case structs.KVDeleteTree:
 		return c.state.KVSDeleteTree(index, req.DirEnt.Key)
-	case api.KVCAS:
+	case structs.KVCAS:
 		act, err := c.state.KVSSetCAS(index, &req.DirEnt)
 		if err != nil {
 			return err
 		}
 		return act
-	case api.KVLock:
+	case structs.KVLock:
 		act, err := c.state.KVSLock(index, &req.DirEnt)
 		if err != nil {
 			return err
 		}
 		return act
-	case api.KVUnlock:
+	case structs.KVUnlock:
 		act, err := c.state.KVSUnlock(index, &req.DirEnt)
 		if err != nil {
 			return err

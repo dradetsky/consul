@@ -11,7 +11,6 @@ import (
 	"github.com/armon/go-metrics"
 	"github.com/hashicorp/consul/agent/consul/agent"
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/types"
 	"github.com/hashicorp/raft"
 	"github.com/hashicorp/serf/serf"
@@ -327,7 +326,7 @@ func (s *Server) reconcile() (err error) {
 // a "reap" event to cause the node to be cleaned up.
 func (s *Server) reconcileReaped(known map[string]struct{}) error {
 	state := s.fsm.State()
-	_, checks, err := state.ChecksInState(nil, api.HealthAny)
+	_, checks, err := state.ChecksInState(nil, structs.HealthAny)
 	if err != nil {
 		return err
 	}
@@ -472,7 +471,7 @@ func (s *Server) handleAliveMember(member serf.Member) error {
 			return err
 		}
 		for _, check := range checks {
-			if check.CheckID == SerfCheckID && check.Status == api.HealthPassing {
+			if check.CheckID == SerfCheckID && check.Status == structs.HealthPassing {
 				return nil
 			}
 		}
@@ -491,7 +490,7 @@ AFTER_CHECK:
 			Node:    member.Name,
 			CheckID: SerfCheckID,
 			Name:    SerfCheckName,
-			Status:  api.HealthPassing,
+			Status:  structs.HealthPassing,
 			Output:  SerfCheckAliveOutput,
 		},
 
@@ -519,7 +518,7 @@ func (s *Server) handleFailedMember(member serf.Member) error {
 			return err
 		}
 		for _, check := range checks {
-			if check.CheckID == SerfCheckID && check.Status == api.HealthCritical {
+			if check.CheckID == SerfCheckID && check.Status == structs.HealthCritical {
 				return nil
 			}
 		}
@@ -536,7 +535,7 @@ func (s *Server) handleFailedMember(member serf.Member) error {
 			Node:    member.Name,
 			CheckID: SerfCheckID,
 			Name:    SerfCheckName,
-			Status:  api.HealthCritical,
+			Status:  structs.HealthCritical,
 			Output:  SerfCheckFailedOutput,
 		},
 

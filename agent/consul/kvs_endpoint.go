@@ -8,7 +8,6 @@ import (
 	"github.com/hashicorp/consul/acl"
 	"github.com/hashicorp/consul/agent/consul/state"
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/go-memdb"
 )
 
@@ -20,24 +19,24 @@ type KVS struct {
 // preApply does all the verification of a KVS update that is performed BEFORE
 // we submit as a Raft log entry. This includes enforcing the lock delay which
 // must only be done on the leader.
-func kvsPreApply(srv *Server, acl acl.ACL, op api.KVOp, dirEnt *structs.DirEntry) (bool, error) {
+func kvsPreApply(srv *Server, acl acl.ACL, op structs.KVOp, dirEnt *structs.DirEntry) (bool, error) {
 	// Verify the entry.
-	if dirEnt.Key == "" && op != api.KVDeleteTree {
+	if dirEnt.Key == "" && op != structs.KVDeleteTree {
 		return false, fmt.Errorf("Must provide key")
 	}
 
 	// Apply the ACL policy if any.
 	if acl != nil {
 		switch op {
-		case api.KVDeleteTree:
+		case structs.KVDeleteTree:
 			if !acl.KeyWritePrefix(dirEnt.Key) {
 				return false, errPermissionDenied
 			}
 
-		case api.KVGet, api.KVGetTree:
+		case structs.KVGet, structs.KVGetTree:
 			// Filtering for GETs is done on the output side.
 
-		case api.KVCheckSession, api.KVCheckIndex:
+		case structs.KVCheckSession, structs.KVCheckIndex:
 			// These could reveal information based on the outcome
 			// of the transaction, and they operate on individual
 			// keys so we check them here.
@@ -58,7 +57,7 @@ func kvsPreApply(srv *Server, acl acl.ACL, op api.KVOp, dirEnt *structs.DirEntry
 	// after the raft log is committed as it would lead to inconsistent FSMs.
 	// Instead, the lock-delay must be enforced before commit. This means that
 	// only the wall-time of the leader node is used, preventing any inconsistencies.
-	if op == api.KVLock {
+	if op == structs.KVLock {
 		state := srv.fsm.State()
 		expires := state.KVSLockDelay(dirEnt.Key)
 		if expires.After(time.Now()) {

@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/testrpc"
 	"github.com/hashicorp/consul/testutil/retry"
 	"github.com/hashicorp/net-rpc-msgpackrpc"
@@ -1990,7 +1989,7 @@ func TestPreparedQuery_Execute(t *testing.T) {
 			t.Fatalf("err: %v", err)
 		}
 	}
-	setHealth("node1", api.HealthCritical)
+	setHealth("node1", structs.HealthCritical)
 
 	// The failing node should be filtered.
 	{
@@ -2020,7 +2019,7 @@ func TestPreparedQuery_Execute(t *testing.T) {
 	}
 
 	// Upgrade it to a warning and re-query, should be 10 nodes again.
-	setHealth("node1", api.HealthWarning)
+	setHealth("node1", structs.HealthWarning)
 	{
 		req := structs.PreparedQueryExecuteRequest{
 			Datacenter:    "dc1",
@@ -2272,7 +2271,7 @@ func TestPreparedQuery_Execute(t *testing.T) {
 
 	// Now fail everything in dc1 and we should get an empty list back.
 	for i := 0; i < 10; i++ {
-		setHealth(fmt.Sprintf("node%d", i+1), api.HealthCritical)
+		setHealth(fmt.Sprintf("node%d", i+1), structs.HealthCritical)
 	}
 	{
 		req := structs.PreparedQueryExecuteRequest{
