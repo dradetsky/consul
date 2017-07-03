@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 )
 
 func TestStateStore_Txn_KVS(t *testing.T) {
@@ -30,7 +29,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 	ops := structs.TxnOps{
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVGetTree,
+				Verb: structs.KVGetTree,
 				DirEnt: structs.DirEntry{
 					Key: "foo/bar",
 				},
@@ -38,7 +37,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVSet,
+				Verb: structs.KVSet,
 				DirEnt: structs.DirEntry{
 					Key:   "foo/new",
 					Value: []byte("one"),
@@ -47,7 +46,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVDelete,
+				Verb: structs.KVDelete,
 				DirEnt: structs.DirEntry{
 					Key: "foo/zorp",
 				},
@@ -55,7 +54,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVDeleteCAS,
+				Verb: structs.KVDeleteCAS,
 				DirEnt: structs.DirEntry{
 					Key: "foo/delete",
 					RaftIndex: structs.RaftIndex{
@@ -66,7 +65,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVDeleteTree,
+				Verb: structs.KVDeleteTree,
 				DirEnt: structs.DirEntry{
 					Key: "foo/bar",
 				},
@@ -74,7 +73,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVGet,
+				Verb: structs.KVGet,
 				DirEnt: structs.DirEntry{
 					Key: "foo/update",
 				},
@@ -82,7 +81,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVCheckIndex,
+				Verb: structs.KVCheckIndex,
 				DirEnt: structs.DirEntry{
 					Key: "foo/update",
 					RaftIndex: structs.RaftIndex{
@@ -93,7 +92,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVCAS,
+				Verb: structs.KVCAS,
 				DirEnt: structs.DirEntry{
 					Key:   "foo/update",
 					Value: []byte("new"),
@@ -105,7 +104,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVGet,
+				Verb: structs.KVGet,
 				DirEnt: structs.DirEntry{
 					Key: "foo/update",
 				},
@@ -113,7 +112,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVCheckIndex,
+				Verb: structs.KVCheckIndex,
 				DirEnt: structs.DirEntry{
 					Key: "foo/update",
 					RaftIndex: structs.RaftIndex{
@@ -124,7 +123,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVLock,
+				Verb: structs.KVLock,
 				DirEnt: structs.DirEntry{
 					Key:     "foo/lock",
 					Session: session,
@@ -133,7 +132,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVCheckSession,
+				Verb: structs.KVCheckSession,
 				DirEnt: structs.DirEntry{
 					Key:     "foo/lock",
 					Session: session,
@@ -142,7 +141,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVUnlock,
+				Verb: structs.KVUnlock,
 				DirEnt: structs.DirEntry{
 					Key:     "foo/lock",
 					Session: session,
@@ -151,7 +150,7 @@ func TestStateStore_Txn_KVS(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVCheckSession,
+				Verb: structs.KVCheckSession,
 				DirEnt: structs.DirEntry{
 					Key:     "foo/lock",
 					Session: "",
@@ -417,7 +416,7 @@ func TestStateStore_Txn_KVS_Rollback(t *testing.T) {
 	ops := structs.TxnOps{
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVCAS,
+				Verb: structs.KVCAS,
 				DirEnt: structs.DirEntry{
 					Key:   "foo/update",
 					Value: []byte("new"),
@@ -429,7 +428,7 @@ func TestStateStore_Txn_KVS_Rollback(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVLock,
+				Verb: structs.KVLock,
 				DirEnt: structs.DirEntry{
 					Key:     "foo/lock",
 					Session: bogus,
@@ -438,7 +437,7 @@ func TestStateStore_Txn_KVS_Rollback(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVUnlock,
+				Verb: structs.KVUnlock,
 				DirEnt: structs.DirEntry{
 					Key:     "foo/lock",
 					Session: bogus,
@@ -447,7 +446,7 @@ func TestStateStore_Txn_KVS_Rollback(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVCheckSession,
+				Verb: structs.KVCheckSession,
 				DirEnt: structs.DirEntry{
 					Key:     "foo/lock",
 					Session: bogus,
@@ -456,7 +455,7 @@ func TestStateStore_Txn_KVS_Rollback(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVGet,
+				Verb: structs.KVGet,
 				DirEnt: structs.DirEntry{
 					Key: "nope",
 				},
@@ -464,7 +463,7 @@ func TestStateStore_Txn_KVS_Rollback(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVCheckSession,
+				Verb: structs.KVCheckSession,
 				DirEnt: structs.DirEntry{
 					Key:     "nope",
 					Session: bogus,
@@ -473,7 +472,7 @@ func TestStateStore_Txn_KVS_Rollback(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVCheckIndex,
+				Verb: structs.KVCheckIndex,
 				DirEnt: structs.DirEntry{
 					Key: "foo/lock",
 					RaftIndex: structs.RaftIndex{
@@ -484,7 +483,7 @@ func TestStateStore_Txn_KVS_Rollback(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVCheckIndex,
+				Verb: structs.KVCheckIndex,
 				DirEnt: structs.DirEntry{
 					Key: "nope",
 					RaftIndex: structs.RaftIndex{
@@ -548,7 +547,7 @@ func TestStateStore_Txn_KVS_RO(t *testing.T) {
 	ops := structs.TxnOps{
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVGetTree,
+				Verb: structs.KVGetTree,
 				DirEnt: structs.DirEntry{
 					Key: "foo/bar",
 				},
@@ -556,7 +555,7 @@ func TestStateStore_Txn_KVS_RO(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVGet,
+				Verb: structs.KVGet,
 				DirEnt: structs.DirEntry{
 					Key: "foo",
 				},
@@ -564,7 +563,7 @@ func TestStateStore_Txn_KVS_RO(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVCheckSession,
+				Verb: structs.KVCheckSession,
 				DirEnt: structs.DirEntry{
 					Key:     "foo/bar/baz",
 					Session: "",
@@ -573,7 +572,7 @@ func TestStateStore_Txn_KVS_RO(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVCheckSession,
+				Verb: structs.KVCheckSession,
 				DirEnt: structs.DirEntry{
 					Key: "foo/bar/zip",
 					RaftIndex: structs.RaftIndex{
@@ -661,7 +660,7 @@ func TestStateStore_Txn_KVS_RO_Safety(t *testing.T) {
 	ops := structs.TxnOps{
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVSet,
+				Verb: structs.KVSet,
 				DirEnt: structs.DirEntry{
 					Key:   "foo",
 					Value: []byte("nope"),
@@ -670,7 +669,7 @@ func TestStateStore_Txn_KVS_RO_Safety(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVDelete,
+				Verb: structs.KVDelete,
 				DirEnt: structs.DirEntry{
 					Key: "foo/bar/baz",
 				},
@@ -678,7 +677,7 @@ func TestStateStore_Txn_KVS_RO_Safety(t *testing.T) {
 		},
 		&structs.TxnOp{
 			KV: &structs.TxnKVOp{
-				Verb: api.KVDeleteTree,
+				Verb: structs.KVDeleteTree,
 				DirEnt: structs.DirEntry{
 					Key: "foo/bar",
 				},

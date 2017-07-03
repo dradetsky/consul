@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/types"
 	"github.com/hashicorp/go-memdb"
 )
@@ -885,7 +884,7 @@ func (s *Store) ensureCheckTxn(tx *memdb.Txn, idx uint64, hc *structs.HealthChec
 
 	// Use the default check status if none was provided
 	if hc.Status == "" {
-		hc.Status = api.HealthCritical
+		hc.Status = structs.HealthCritical
 	}
 
 	// Get the node
@@ -915,7 +914,7 @@ func (s *Store) ensureCheckTxn(tx *memdb.Txn, idx uint64, hc *structs.HealthChec
 	}
 
 	// Delete any sessions for this check if the health is critical.
-	if hc.Status == api.HealthCritical {
+	if hc.Status == structs.HealthCritical {
 		mappings, err := tx.Get("session_checks", "node_check", hc.Node, string(hc.CheckID))
 		if err != nil {
 			return fmt.Errorf("failed session checks lookup: %s", err)
@@ -1048,7 +1047,7 @@ func (s *Store) ChecksInState(ws memdb.WatchSet, state string) (uint64, structs.
 	// Query all checks if HealthAny is passed, otherwise use the index.
 	var iter memdb.ResultIterator
 	var err error
-	if state == api.HealthAny {
+	if state == structs.HealthAny {
 		iter, err = tx.Get("checks", "status")
 	} else {
 		iter, err = tx.Get("checks", "status", state)
@@ -1077,7 +1076,7 @@ func (s *Store) ChecksInStateByNodeMeta(ws memdb.WatchSet, state string, filters
 	// Query all checks if HealthAny is passed, otherwise use the index.
 	var iter memdb.ResultIterator
 	var err error
-	if state == api.HealthAny {
+	if state == structs.HealthAny {
 		iter, err = tx.Get("checks", "status")
 		if err != nil {
 			return 0, nil, fmt.Errorf("failed check lookup: %s", err)
