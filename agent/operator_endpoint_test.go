@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/testutil/retry"
+	"github.com/hashicorp/serf/serf"
 )
 
 func TestOperator_RaftConfiguration(t *testing.T) {
@@ -302,7 +302,7 @@ func TestOperator_AutopilotGetConfiguration(t *testing.T) {
 	if resp.Code != 200 {
 		t.Fatalf("bad code: %d", resp.Code)
 	}
-	out, ok := obj.(api.AutopilotConfiguration)
+	out, ok := obj.(structs.AutopilotConfig)
 	if !ok {
 		t.Fatalf("unexpected: %T", obj)
 	}
@@ -424,14 +424,14 @@ func TestOperator_ServerHealth(t *testing.T) {
 		if resp.Code != 200 {
 			r.Fatalf("bad code: %d", resp.Code)
 		}
-		out, ok := obj.(*api.OperatorHealthReply)
+		out, ok := obj.(*structs.OperatorHealthReply)
 		if !ok {
 			r.Fatalf("unexpected: %T", obj)
 		}
 		if len(out.Servers) != 1 ||
 			!out.Servers[0].Healthy ||
 			out.Servers[0].Name != a.Config.NodeName ||
-			out.Servers[0].SerfStatus != "alive" ||
+			out.Servers[0].SerfStatus != serf.MemberStatus("alive") ||
 			out.FailureTolerance != 0 {
 			r.Fatalf("bad: %v", out)
 		}
@@ -458,7 +458,7 @@ func TestOperator_ServerHealth_Unhealthy(t *testing.T) {
 		if resp.Code != 429 {
 			r.Fatalf("bad code: %d", resp.Code)
 		}
-		out, ok := obj.(*api.OperatorHealthReply)
+		out, ok := obj.(*structs.OperatorHealthReply)
 		if !ok {
 			r.Fatalf("unexpected: %T", obj)
 		}

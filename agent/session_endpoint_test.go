@@ -10,7 +10,6 @@ import (
 
 	"github.com/hashicorp/consul/agent/consul"
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/types"
 )
 
@@ -29,7 +28,7 @@ func TestSessionCreate(t *testing.T) {
 			Node:      a.Config.NodeName,
 			Name:      "consul",
 			ServiceID: "consul",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 		},
 	}
 	var out struct{}
@@ -75,7 +74,7 @@ func TestSessionCreateDelete(t *testing.T) {
 			Node:      a.Config.NodeName,
 			Name:      "consul",
 			ServiceID: "consul",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 		},
 	}
 	var out struct{}

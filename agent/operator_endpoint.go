@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/raft"
 )
@@ -203,15 +202,17 @@ func (s *HTTPServer) OperatorAutopilotConfiguration(resp http.ResponseWriter, re
 			return nil, err
 		}
 
-		out := api.AutopilotConfiguration{
+		out := structs.AutopilotConfig{
 			CleanupDeadServers:      reply.CleanupDeadServers,
-			LastContactThreshold:    api.NewReadableDuration(reply.LastContactThreshold),
+			LastContactThreshold:    reply.LastContactThreshold,
 			MaxTrailingLogs:         reply.MaxTrailingLogs,
-			ServerStabilizationTime: api.NewReadableDuration(reply.ServerStabilizationTime),
+			ServerStabilizationTime: reply.ServerStabilizationTime,
 			RedundancyZoneTag:       reply.RedundancyZoneTag,
 			DisableUpgradeMigration: reply.DisableUpgradeMigration,
-			CreateIndex:             reply.CreateIndex,
-			ModifyIndex:             reply.ModifyIndex,
+			RaftIndex: structs.RaftIndex{
+				CreateIndex: reply.CreateIndex,
+				ModifyIndex: reply.ModifyIndex,
+			},
 		}
 
 		return out, nil
@@ -221,7 +222,7 @@ func (s *HTTPServer) OperatorAutopilotConfiguration(resp http.ResponseWriter, re
 		s.parseDC(req, &args.Datacenter)
 		s.parseToken(req, &args.Token)
 
-		var conf api.AutopilotConfiguration
+		var conf structs.AutopilotConfig
 		if err := decodeBody(req, &conf, FixupConfigDurations); err != nil {
 			resp.WriteHeader(400)
 			fmt.Fprintf(resp, "Error parsing autopilot config: %v", err)
@@ -230,9 +231,9 @@ func (s *HTTPServer) OperatorAutopilotConfiguration(resp http.ResponseWriter, re
 
 		args.Config = structs.AutopilotConfig{
 			CleanupDeadServers:      conf.CleanupDeadServers,
-			LastContactThreshold:    conf.LastContactThreshold.Duration(),
+			LastContactThreshold:    conf.LastContactThreshold,
 			MaxTrailingLogs:         conf.MaxTrailingLogs,
-			ServerStabilizationTime: conf.ServerStabilizationTime.Duration(),
+			ServerStabilizationTime: conf.ServerStabilizationTime,
 			RedundancyZoneTag:       conf.RedundancyZoneTag,
 			DisableUpgradeMigration: conf.DisableUpgradeMigration,
 		}
@@ -312,19 +313,19 @@ func (s *HTTPServer) OperatorServerHealth(resp http.ResponseWriter, req *http.Re
 		resp.WriteHeader(http.StatusTooManyRequests)
 	}
 
-	out := &api.OperatorHealthReply{
+	out := &structs.OperatorHealthReply{
 		Healthy:          reply.Healthy,
 		FailureTolerance: reply.FailureTolerance,
 	}
 	for _, server := range reply.Servers {
-		out.Servers = append(out.Servers, api.ServerHealth{
+		out.Servers = append(out.Servers, structs.ServerHealth{
 			ID:          server.ID,
 			Name:        server.Name,
 			Address:     server.Address,
 			Version:     server.Version,
 			Leader:      server.Leader,
-			SerfStatus:  server.SerfStatus.String(),
-			LastContact: api.NewReadableDuration(server.LastContact),
+			SerfStatus:  server.SerfStatus,
+			LastContact: server.LastContact,
 			LastTerm:    server.LastTerm,
 			LastIndex:   server.LastIndex,
 			Healthy:     server.Healthy,

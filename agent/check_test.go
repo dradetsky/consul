@@ -17,8 +17,8 @@ import (
 	"time"
 
 	docker "github.com/fsouza/go-dockerclient"
+	"github.com/hashicorp/consul/agent/consul/structs"
 	"github.com/hashicorp/consul/agent/mock"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/testutil/retry"
 	"github.com/hashicorp/consul/types"
 )
@@ -46,22 +46,22 @@ func expectStatus(t *testing.T, script, status string) {
 
 func TestCheckMonitor_Passing(t *testing.T) {
 	t.Parallel()
-	expectStatus(t, "exit 0", api.HealthPassing)
+	expectStatus(t, "exit 0", structs.HealthPassing)
 }
 
 func TestCheckMonitor_Warning(t *testing.T) {
 	t.Parallel()
-	expectStatus(t, "exit 1", api.HealthWarning)
+	expectStatus(t, "exit 1", structs.HealthWarning)
 }
 
 func TestCheckMonitor_Critical(t *testing.T) {
 	t.Parallel()
-	expectStatus(t, "exit 2", api.HealthCritical)
+	expectStatus(t, "exit 2", structs.HealthCritical)
 }
 
 func TestCheckMonitor_BadCmd(t *testing.T) {
 	t.Parallel()
-	expectStatus(t, "foobarbaz", api.HealthCritical)
+	expectStatus(t, "foobarbaz", structs.HealthCritical)
 }
 
 func TestCheckMonitor_Timeout(t *testing.T) {
@@ -109,8 +109,8 @@ func TestCheckMonitor_RandomStagger(t *testing.T) {
 		t.Fatalf("should have 1 or more updates %v", notif.UpdatesMap())
 	}
 
-	if notif.State("foo") != api.HealthPassing {
-		t.Fatalf("should be %v %v", api.HealthPassing, notif.StateMap())
+	if notif.State("foo") != structs.HealthPassing {
+		t.Fatalf("should be %v %v", structs.HealthPassing, notif.StateMap())
 	}
 }
 
@@ -148,13 +148,13 @@ func TestCheckTTL(t *testing.T) {
 	defer check.Stop()
 
 	time.Sleep(50 * time.Millisecond)
-	check.SetStatus(api.HealthPassing, "test-output")
+	check.SetStatus(structs.HealthPassing, "test-output")
 
 	if notif.Updates("foo") != 1 {
 		t.Fatalf("should have 1 updates %v", notif.UpdatesMap())
 	}
 
-	if notif.State("foo") != api.HealthPassing {
+	if notif.State("foo") != structs.HealthPassing {
 		t.Fatalf("should be passing %v", notif.StateMap())
 	}
 
@@ -171,7 +171,7 @@ func TestCheckTTL(t *testing.T) {
 		t.Fatalf("should have 2 updates %v", notif.UpdatesMap())
 	}
 
-	if notif.State("foo") != api.HealthCritical {
+	if notif.State("foo") != structs.HealthCritical {
 		t.Fatalf("should be critical %v", notif.StateMap())
 	}
 
@@ -191,28 +191,28 @@ func TestCheckHTTP(t *testing.T) {
 		status string
 	}{
 		// passing
-		{code: 200, status: api.HealthPassing},
-		{code: 201, status: api.HealthPassing},
-		{code: 250, status: api.HealthPassing},
-		{code: 299, status: api.HealthPassing},
+		{code: 200, status: structs.HealthPassing},
+		{code: 201, status: structs.HealthPassing},
+		{code: 250, status: structs.HealthPassing},
+		{code: 299, status: structs.HealthPassing},
 
 		// warning
-		{code: 429, status: api.HealthWarning},
+		{code: 429, status: structs.HealthWarning},
 
 		// critical
-		{code: 150, status: api.HealthCritical},
-		{code: 199, status: api.HealthCritical},
-		{code: 300, status: api.HealthCritical},
-		{code: 400, status: api.HealthCritical},
-		{code: 500, status: api.HealthCritical},
+		{code: 150, status: structs.HealthCritical},
+		{code: 199, status: structs.HealthCritical},
+		{code: 300, status: structs.HealthCritical},
+		{code: 400, status: structs.HealthCritical},
+		{code: 500, status: structs.HealthCritical},
 
 		// custom method
-		{desc: "custom method GET", code: 200, method: "GET", status: api.HealthPassing},
-		{desc: "custom method POST", code: 200, header: http.Header{"Content-Length": []string{"0"}}, method: "POST", status: api.HealthPassing},
-		{desc: "custom method abc", code: 200, method: "abc", status: api.HealthPassing},
+		{desc: "custom method GET", code: 200, method: "GET", status: structs.HealthPassing},
+		{desc: "custom method POST", code: 200, header: http.Header{"Content-Length": []string{"0"}}, method: "POST", status: structs.HealthPassing},
+		{desc: "custom method abc", code: 200, method: "abc", status: structs.HealthPassing},
 
 		// custom header
-		{desc: "custom header", code: 200, header: http.Header{"A": []string{"b", "c"}}, status: api.HealthPassing},
+		{desc: "custom header", code: 200, header: http.Header{"A": []string{"b", "c"}}, status: structs.HealthPassing},
 	}
 
 	for _, tt := range tests {
@@ -301,7 +301,7 @@ func TestCheckHTTPTimeout(t *testing.T) {
 		if got, want := notif.Updates("bar"), 2; got < want {
 			r.Fatalf("got %d updates want at least %d", got, want)
 		}
-		if got, want := notif.State("bar"), api.HealthCritical; got != want {
+		if got, want := notif.State("bar"), structs.HealthCritical; got != want {
 			r.Fatalf("got state %q want %q", got, want)
 		}
 	})
@@ -373,7 +373,7 @@ func TestCheckHTTP_TLSSkipVerify_true_pass(t *testing.T) {
 		t.Fatalf("should be true")
 	}
 	retry.Run(t, func(r *retry.R) {
-		if got, want := notif.State("skipverify_true"), api.HealthPassing; got != want {
+		if got, want := notif.State("skipverify_true"), structs.HealthPassing; got != want {
 			r.Fatalf("got state %q want %q", got, want)
 		}
 	})
@@ -401,7 +401,7 @@ func TestCheckHTTP_TLSSkipVerify_true_fail(t *testing.T) {
 		t.Fatalf("should be true")
 	}
 	retry.Run(t, func(r *retry.R) {
-		if got, want := notif.State("skipverify_true"), api.HealthCritical; got != want {
+		if got, want := notif.State("skipverify_true"), structs.HealthCritical; got != want {
 			r.Fatalf("got state %q want %q", got, want)
 		}
 	})
@@ -431,7 +431,7 @@ func TestCheckHTTP_TLSSkipVerify_false(t *testing.T) {
 	}
 	retry.Run(t, func(r *retry.R) {
 		// This should fail due to an invalid SSL cert
-		if got, want := notif.State("skipverify_false"), api.HealthCritical; got != want {
+		if got, want := notif.State("skipverify_false"), structs.HealthCritical; got != want {
 			r.Fatalf("got state %q want %q", got, want)
 		}
 		if !strings.Contains(notif.Output("skipverify_false"), "certificate signed by unknown authority") {
@@ -487,7 +487,7 @@ func TestCheckTCPCritical(t *testing.T) {
 	)
 
 	tcpServer = mockTCPServer(`tcp`)
-	expectTCPStatus(t, `127.0.0.1:0`, api.HealthCritical)
+	expectTCPStatus(t, `127.0.0.1:0`, structs.HealthCritical)
 	tcpServer.Close()
 }
 
@@ -498,11 +498,11 @@ func TestCheckTCPPassing(t *testing.T) {
 	)
 
 	tcpServer = mockTCPServer(`tcp`)
-	expectTCPStatus(t, tcpServer.Addr().String(), api.HealthPassing)
+	expectTCPStatus(t, tcpServer.Addr().String(), structs.HealthPassing)
 	tcpServer.Close()
 
 	tcpServer = mockTCPServer(`tcp6`)
-	expectTCPStatus(t, tcpServer.Addr().String(), api.HealthPassing)
+	expectTCPStatus(t, tcpServer.Addr().String(), structs.HealthPassing)
 	tcpServer.Close()
 }
 
@@ -667,32 +667,32 @@ func expectDockerCheckStatus(t *testing.T, dockerClient DockerClient, status str
 
 func TestDockerCheckWhenExecReturnsSuccessExitCode(t *testing.T) {
 	t.Parallel()
-	expectDockerCheckStatus(t, &fakeDockerClientWithNoErrors{}, api.HealthPassing, "output")
+	expectDockerCheckStatus(t, &fakeDockerClientWithNoErrors{}, structs.HealthPassing, "output")
 }
 
 func TestDockerCheckWhenExecCreationFails(t *testing.T) {
 	t.Parallel()
-	expectDockerCheckStatus(t, &fakeDockerClientWithCreateExecFailure{}, api.HealthCritical, "Unable to create Exec, error: Exec Creation Failed")
+	expectDockerCheckStatus(t, &fakeDockerClientWithCreateExecFailure{}, structs.HealthCritical, "Unable to create Exec, error: Exec Creation Failed")
 }
 
 func TestDockerCheckWhenExitCodeIsNonZero(t *testing.T) {
 	t.Parallel()
-	expectDockerCheckStatus(t, &fakeDockerClientWithExecNonZeroExitCode{}, api.HealthCritical, "")
+	expectDockerCheckStatus(t, &fakeDockerClientWithExecNonZeroExitCode{}, structs.HealthCritical, "")
 }
 
 func TestDockerCheckWhenExitCodeIsone(t *testing.T) {
 	t.Parallel()
-	expectDockerCheckStatus(t, &fakeDockerClientWithExecExitCodeOne{}, api.HealthWarning, "output")
+	expectDockerCheckStatus(t, &fakeDockerClientWithExecExitCodeOne{}, structs.HealthWarning, "output")
 }
 
 func TestDockerCheckWhenExecStartFails(t *testing.T) {
 	t.Parallel()
-	expectDockerCheckStatus(t, &fakeDockerClientWithStartExecFailure{}, api.HealthCritical, "Unable to start Exec: Couldn't Start Exec")
+	expectDockerCheckStatus(t, &fakeDockerClientWithStartExecFailure{}, structs.HealthCritical, "Unable to start Exec: Couldn't Start Exec")
 }
 
 func TestDockerCheckWhenExecInfoFails(t *testing.T) {
 	t.Parallel()
-	expectDockerCheckStatus(t, &fakeDockerClientWithExecInfoErrors{}, api.HealthCritical, "Unable to inspect Exec: Unable to query exec info")
+	expectDockerCheckStatus(t, &fakeDockerClientWithExecInfoErrors{}, structs.HealthCritical, "Unable to inspect Exec: Unable to query exec info")
 }
 
 func TestDockerCheckDefaultToSh(t *testing.T) {

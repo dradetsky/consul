@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 )
 
 const (
@@ -83,9 +82,9 @@ func fixupKVOps(raw interface{}) error {
 }
 
 // isWrite returns true if the given operation alters the state store.
-func isWrite(op api.KVOp) bool {
+func isWrite(op structs.KVOp) bool {
 	switch op {
-	case api.KVSet, api.KVDelete, api.KVDeleteCAS, api.KVDeleteTree, api.KVCAS, api.KVLock, api.KVUnlock:
+	case structs.KVSet, structs.KVDelete, structs.KVDeleteCAS, structs.KVDeleteTree, structs.KVCAS, structs.KVLock, structs.KVUnlock:
 		return true
 	}
 	return false
@@ -99,7 +98,21 @@ func (s *HTTPServer) convertOps(resp http.ResponseWriter, req *http.Request) (st
 	// Note the body is in API format, and not the RPC format. If we can't
 	// decode it, we will return a 400 since we don't have enough context to
 	// associate the error with a given operation.
-	var ops api.TxnOps
+
+	// this is a copy of the api.TxnOp data structure to break the import
+	// dependency between agent and api.
+	type KVTxnOp struct {
+		Verb    structs.KVOp
+		Key     string
+		Value   []byte
+		Flags   uint64
+		Index   uint64
+		Session string
+	}
+	type TxnOp struct {
+		KV *KVTxnOp
+	}
+	var ops []*TxnOp
 	if err := decodeBody(req, &ops, fixupKVOps); err != nil {
 		resp.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(resp, "Failed to parse body: %v", err)
@@ -132,7 +145,7 @@ func (s *HTTPServer) convertOps(resp http.ResponseWriter, req *http.Request) (st
 			}
 			netKVSize += size
 
-			verb := api.KVOp(in.KV.Verb)
+			verb := structs.KVOp(in.KV.Verb)
 			if isWrite(verb) {
 				writes++
 			}

@@ -241,7 +241,7 @@ type Telemetry struct {
 	// Default: "consul"
 	CirconusAPIApp string `mapstructure:"circonus_api_app"`
 	// CirconusAPIURL is the base URL to use for contacting the Circonus API.
-	// Default: "https://api.circonus.com/v2"
+	// Default: "https://structs.circonus.com/v2"
 	CirconusAPIURL string `mapstructure:"circonus_api_url"`
 	// CirconusSubmissionInterval is the interval at which metrics are submitted to Circonus.
 	// Default: 10s

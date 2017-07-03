@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 )
 
 func (s *HTTPServer) HealthChecksInState(resp http.ResponseWriter, req *http.Request) (interface{}, error) {
@@ -148,8 +147,8 @@ func (s *HTTPServer) HealthServiceNodes(resp http.ResponseWriter, req *http.Requ
 	}
 
 	// Filter to only passing if specified
-	if _, ok := params[api.HealthPassing]; ok {
-		val := params.Get(api.HealthPassing)
+	if _, ok := params[structs.HealthPassing]; ok {
+		val := params.Get(structs.HealthPassing)
 		// Backwards-compat to allow users to specify ?passing without a value. This
 		// should be removed in Consul 0.10.
 		var filter bool
@@ -203,7 +202,7 @@ OUTER:
 	for i := 0; i < n; i++ {
 		node := nodes[i]
 		for _, check := range node.Checks {
-			if check.Status != api.HealthPassing {
+			if check.Status != structs.HealthPassing {
 				nodes[i], nodes[n-1] = nodes[n-1], structs.CheckServiceNode{}
 				n--
 				i--

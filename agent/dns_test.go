@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/lib"
 	"github.com/hashicorp/consul/testutil/retry"
 	"github.com/miekg/dns"
@@ -2059,7 +2058,7 @@ func TestDNS_ServiceLookup_FilterCritical(t *testing.T) {
 			Check: &structs.HealthCheck{
 				CheckID: "serf",
 				Name:    "serf",
-				Status:  api.HealthCritical,
+				Status:  structs.HealthCritical,
 			},
 		}
 
@@ -2080,7 +2079,7 @@ func TestDNS_ServiceLookup_FilterCritical(t *testing.T) {
 			Check: &structs.HealthCheck{
 				CheckID: "serf",
 				Name:    "serf",
-				Status:  api.HealthCritical,
+				Status:  structs.HealthCritical,
 			},
 		}
 		if err := a.RPC("Catalog.Register", args2, &out); err != nil {
@@ -2100,7 +2099,7 @@ func TestDNS_ServiceLookup_FilterCritical(t *testing.T) {
 				CheckID:   "db",
 				Name:      "db",
 				ServiceID: "db",
-				Status:    api.HealthCritical,
+				Status:    structs.HealthCritical,
 			},
 		}
 		if err := a.RPC("Catalog.Register", args3, &out); err != nil {
@@ -2134,7 +2133,7 @@ func TestDNS_ServiceLookup_FilterCritical(t *testing.T) {
 				CheckID:   "db",
 				Name:      "db",
 				ServiceID: "db",
-				Status:    api.HealthWarning,
+				Status:    structs.HealthWarning,
 			},
 		}
 		if err := a.RPC("Catalog.Register", args5, &out); err != nil {
@@ -2215,7 +2214,7 @@ func TestDNS_ServiceLookup_OnlyFailing(t *testing.T) {
 			Check: &structs.HealthCheck{
 				CheckID: "serf",
 				Name:    "serf",
-				Status:  api.HealthCritical,
+				Status:  structs.HealthCritical,
 			},
 		}
 
@@ -2236,7 +2235,7 @@ func TestDNS_ServiceLookup_OnlyFailing(t *testing.T) {
 			Check: &structs.HealthCheck{
 				CheckID: "serf",
 				Name:    "serf",
-				Status:  api.HealthCritical,
+				Status:  structs.HealthCritical,
 			},
 		}
 		if err := a.RPC("Catalog.Register", args2, &out); err != nil {
@@ -2256,7 +2255,7 @@ func TestDNS_ServiceLookup_OnlyFailing(t *testing.T) {
 				CheckID:   "db",
 				Name:      "db",
 				ServiceID: "db",
-				Status:    api.HealthCritical,
+				Status:    structs.HealthCritical,
 			},
 		}
 		if err := a.RPC("Catalog.Register", args3, &out); err != nil {
@@ -2331,7 +2330,7 @@ func TestDNS_ServiceLookup_OnlyPassing(t *testing.T) {
 				CheckID:   "db",
 				Name:      "db",
 				ServiceID: "db",
-				Status:    api.HealthPassing,
+				Status:    structs.HealthPassing,
 			},
 		}
 
@@ -2353,7 +2352,7 @@ func TestDNS_ServiceLookup_OnlyPassing(t *testing.T) {
 				CheckID:   "db",
 				Name:      "db",
 				ServiceID: "db",
-				Status:    api.HealthWarning,
+				Status:    structs.HealthWarning,
 			},
 		}
 
@@ -2374,7 +2373,7 @@ func TestDNS_ServiceLookup_OnlyPassing(t *testing.T) {
 				CheckID:   "db",
 				Name:      "db",
 				ServiceID: "db",
-				Status:    api.HealthCritical,
+				Status:    structs.HealthCritical,
 			},
 		}
 
@@ -3136,7 +3135,7 @@ func TestDNS_ServiceLookup_TTL(t *testing.T) {
 	}
 
 	m = new(dns.Msg)
-	m.SetQuestion("api.service.consul.", dns.TypeSRV)
+	m.SetQuestion("structs.service.consul.", dns.TypeSRV)
 	in, _, err = c.Exchange(m, addr.String())
 	if err != nil {
 		t.Fatalf("err: %v", err)

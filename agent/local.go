@@ -11,7 +11,6 @@ import (
 
 	"github.com/hashicorp/consul/agent/consul"
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/lib"
 	"github.com/hashicorp/consul/types"
 )
@@ -288,7 +287,7 @@ func (l *localState) UpdateCheck(checkID types.CheckID, status, output string) {
 
 	// Update the critical time tracking (this doesn't cause a server updates
 	// so we can always keep this up to date).
-	if status == api.HealthCritical {
+	if status == structs.HealthCritical {
 		_, wasCritical := l.checkCriticalTime[checkID]
 		if !wasCritical {
 			l.checkCriticalTime[checkID] = time.Now()

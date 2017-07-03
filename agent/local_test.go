@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/testutil/retry"
 	"github.com/hashicorp/consul/types"
 )
@@ -372,7 +371,7 @@ func TestAgentAntiEntropy_Services_WithChecks(t *testing.T) {
 			CheckID:   "mysql",
 			Name:      "mysql",
 			ServiceID: "mysql",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 		}
 		a.state.AddCheck(chk, "")
 
@@ -429,7 +428,7 @@ func TestAgentAntiEntropy_Services_WithChecks(t *testing.T) {
 			CheckID:   "redis:1",
 			Name:      "redis:1",
 			ServiceID: "redis",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 		}
 		a.state.AddCheck(chk1, "")
 
@@ -438,7 +437,7 @@ func TestAgentAntiEntropy_Services_WithChecks(t *testing.T) {
 			CheckID:   "redis:2",
 			Name:      "redis:2",
 			ServiceID: "redis",
-			Status:    api.HealthPassing,
+			Status:    structs.HealthPassing,
 		}
 		a.state.AddCheck(chk2, "")
 
@@ -686,7 +685,7 @@ func TestAgentAntiEntropy_Checks(t *testing.T) {
 		Node:    a.Config.NodeName,
 		CheckID: "mysql",
 		Name:    "mysql",
-		Status:  api.HealthPassing,
+		Status:  structs.HealthPassing,
 	}
 	a.state.AddCheck(chk1, "")
 	args.Check = chk1
@@ -699,13 +698,13 @@ func TestAgentAntiEntropy_Checks(t *testing.T) {
 		Node:    a.Config.NodeName,
 		CheckID: "redis",
 		Name:    "redis",
-		Status:  api.HealthPassing,
+		Status:  structs.HealthPassing,
 	}
 	a.state.AddCheck(chk2, "")
 
 	chk2_mod := new(structs.HealthCheck)
 	*chk2_mod = *chk2
-	chk2_mod.Status = api.HealthCritical
+	chk2_mod.Status = structs.HealthCritical
 	args.Check = chk2_mod
 	if err := a.RPC("Catalog.Register", args, &out); err != nil {
 		t.Fatalf("err: %v", err)
@@ -716,7 +715,7 @@ func TestAgentAntiEntropy_Checks(t *testing.T) {
 		Node:    a.Config.NodeName,
 		CheckID: "web",
 		Name:    "web",
-		Status:  api.HealthPassing,
+		Status:  structs.HealthPassing,
 	}
 	a.state.AddCheck(chk3, "")
 
@@ -725,7 +724,7 @@ func TestAgentAntiEntropy_Checks(t *testing.T) {
 		Node:    a.Config.NodeName,
 		CheckID: "lb",
 		Name:    "lb",
-		Status:  api.HealthPassing,
+		Status:  structs.HealthPassing,
 	}
 	args.Check = chk4
 	if err := a.RPC("Catalog.Register", args, &out); err != nil {
@@ -737,7 +736,7 @@ func TestAgentAntiEntropy_Checks(t *testing.T) {
 		Node:    a.Config.NodeName,
 		CheckID: "cache",
 		Name:    "cache",
-		Status:  api.HealthPassing,
+		Status:  structs.HealthPassing,
 	}
 	a.state.AddCheck(chk5, "")
 
@@ -1010,7 +1009,7 @@ func TestAgentAntiEntropy_Checks_ACLDeny(t *testing.T) {
 		ServiceTags: []string{"master"},
 		CheckID:     "mysql-check",
 		Name:        "mysql",
-		Status:      api.HealthPassing,
+		Status:      structs.HealthPassing,
 	}
 	a.state.AddCheck(chk1, token)
 
@@ -1022,7 +1021,7 @@ func TestAgentAntiEntropy_Checks_ACLDeny(t *testing.T) {
 		ServiceTags: []string{"foo"},
 		CheckID:     "api-check",
 		Name:        "api",
-		Status:      api.HealthPassing,
+		Status:      structs.HealthPassing,
 	}
 	a.state.AddCheck(chk2, token)
 
@@ -1163,7 +1162,7 @@ func TestAgentAntiEntropy_Check_DeferSync(t *testing.T) {
 		Node:    a.Config.NodeName,
 		CheckID: "web",
 		Name:    "web",
-		Status:  api.HealthPassing,
+		Status:  structs.HealthPassing,
 		Output:  "",
 	}
 	a.state.AddCheck(check, "")
@@ -1187,7 +1186,7 @@ func TestAgentAntiEntropy_Check_DeferSync(t *testing.T) {
 	})
 
 	// Update the check output! Should be deferred
-	a.state.UpdateCheck("web", api.HealthPassing, "output")
+	a.state.UpdateCheck("web", structs.HealthPassing, "output")
 
 	// Should not update for 500 milliseconds
 	time.Sleep(250 * time.Millisecond)
@@ -1286,7 +1285,7 @@ func TestAgentAntiEntropy_Check_DeferSync(t *testing.T) {
 	}
 
 	// Now make an update that should be deferred.
-	a.state.UpdateCheck("web", api.HealthPassing, "deferred")
+	a.state.UpdateCheck("web", structs.HealthPassing, "deferred")
 
 	// Trigger anti-entropy run and wait.
 	a.StartSync()
@@ -1482,7 +1481,7 @@ func TestAgent_checkCriticalTime(t *testing.T) {
 		CheckID:   checkID,
 		Name:      "redis:1",
 		ServiceID: "redis",
-		Status:    api.HealthPassing,
+		Status:    structs.HealthPassing,
 	}
 	l.AddCheck(chk, "")
 	if checks := l.CriticalChecks(); len(checks) > 0 {
@@ -1490,13 +1489,13 @@ func TestAgent_checkCriticalTime(t *testing.T) {
 	}
 
 	// Set it to warning and make sure that doesn't show up as critical.
-	l.UpdateCheck(checkID, api.HealthWarning, "")
+	l.UpdateCheck(checkID, structs.HealthWarning, "")
 	if checks := l.CriticalChecks(); len(checks) > 0 {
 		t.Fatalf("should not have any critical checks")
 	}
 
 	// Fail the check and make sure the time looks reasonable.
-	l.UpdateCheck(checkID, api.HealthCritical, "")
+	l.UpdateCheck(checkID, structs.HealthCritical, "")
 	if crit, ok := l.CriticalChecks()[checkID]; !ok {
 		t.Fatalf("should have a critical check")
 	} else if crit.CriticalFor > time.Millisecond {
@@ -1506,7 +1505,7 @@ func TestAgent_checkCriticalTime(t *testing.T) {
 	// Wait a while, then fail it again and make sure the time keeps track
 	// of the initial failure, and doesn't reset here.
 	time.Sleep(50 * time.Millisecond)
-	l.UpdateCheck(chk.CheckID, api.HealthCritical, "")
+	l.UpdateCheck(chk.CheckID, structs.HealthCritical, "")
 	if crit, ok := l.CriticalChecks()[checkID]; !ok {
 		t.Fatalf("should have a critical check")
 	} else if crit.CriticalFor < 25*time.Millisecond ||
@@ -1515,14 +1514,14 @@ func TestAgent_checkCriticalTime(t *testing.T) {
 	}
 
 	// Set it passing again.
-	l.UpdateCheck(checkID, api.HealthPassing, "")
+	l.UpdateCheck(checkID, structs.HealthPassing, "")
 	if checks := l.CriticalChecks(); len(checks) > 0 {
 		t.Fatalf("should not have any critical checks")
 	}
 
 	// Fail the check and make sure the time looks like it started again
 	// from the latest failure, not the original one.
-	l.UpdateCheck(checkID, api.HealthCritical, "")
+	l.UpdateCheck(checkID, structs.HealthCritical, "")
 	if crit, ok := l.CriticalChecks()[checkID]; !ok {
 		t.Fatalf("should have a critical check")
 	} else if crit.CriticalFor > time.Millisecond {

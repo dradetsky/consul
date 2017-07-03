@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 )
 
 // ServiceSummary is used to summarize a service
@@ -157,11 +156,11 @@ func summarizeServices(dump structs.NodeDump) []*ServiceSummary {
 			}
 			for _, sum := range services {
 				switch check.Status {
-				case api.HealthPassing:
+				case structs.HealthPassing:
 					sum.ChecksPassing++
-				case api.HealthWarning:
+				case structs.HealthWarning:
 					sum.ChecksWarning++
-				case api.HealthCritical:
+				case structs.HealthCritical:
 					sum.ChecksCritical++
 				}
 			}

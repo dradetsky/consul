@@ -23,7 +23,6 @@ import (
 	"github.com/hashicorp/consul/agent/consul"
 	"github.com/hashicorp/consul/agent/consul/structs"
 	"github.com/hashicorp/consul/agent/systemd"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/ipaddr"
 	"github.com/hashicorp/consul/lib"
 	"github.com/hashicorp/consul/logger"
@@ -1543,7 +1542,7 @@ func (a *Agent) AddService(service *structs.NodeService, chkTypes []*structs.Che
 			Node:        a.config.NodeName,
 			CheckID:     types.CheckID(checkID),
 			Name:        name,
-			Status:      api.HealthCritical,
+			Status:      structs.HealthCritical,
 			Notes:       chkType.Notes,
 			ServiceID:   service.ID,
 			ServiceName: service.Service,
@@ -2139,7 +2138,7 @@ func (a *Agent) loadChecks(conf *Config) error {
 		} else {
 			// Default check to critical to avoid placing potentially unhealthy
 			// services into the active pool
-			p.Check.Status = api.HealthCritical
+			p.Check.Status = structs.HealthCritical
 
 			if err := a.AddCheck(p.Check, p.ChkType, false, p.Token); err != nil {
 				// Purge the check if it is unable to be restored.
@@ -2239,7 +2238,7 @@ func (a *Agent) EnableServiceMaintenance(serviceID, reason, token string) error 
 		Notes:       reason,
 		ServiceID:   service.ID,
 		ServiceName: service.Service,
-		Status:      api.HealthCritical,
+		Status:      structs.HealthCritical,
 	}
 	a.AddCheck(check, nil, true, token)
 	a.logger.Printf("[INFO] agent: Service %q entered maintenance mode", serviceID)
@@ -2285,7 +2284,7 @@ func (a *Agent) EnableNodeMaintenance(reason, token string) {
 		CheckID: structs.NodeMaint,
 		Name:    "Node Maintenance Mode",
 		Notes:   reason,
-		Status:  api.HealthCritical,
+		Status:  structs.HealthCritical,
 	}
 	a.AddCheck(check, nil, true, token)
 	a.logger.Printf("[INFO] agent: Node entered maintenance mode")

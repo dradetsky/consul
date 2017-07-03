@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/go-uuid"
 )
 
@@ -303,7 +302,7 @@ func destroySession(t *testing.T, a *Agent, session string) {
 func setKV(t *testing.T, a *Agent, key string, val []byte) {
 	write := structs.KVSRequest{
 		Datacenter: a.config.Datacenter,
-		Op:         api.KVSet,
+		Op:         structs.KVSet,
 		DirEnt: structs.DirEntry{
 			Key:   key,
 			Value: val,

@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 )
 
 const (
@@ -141,7 +140,7 @@ func (s *HTTPServer) KVSPut(resp http.ResponseWriter, req *http.Request, args *s
 	}
 	applyReq := structs.KVSRequest{
 		Datacenter: args.Datacenter,
-		Op:         api.KVSet,
+		Op:         structs.KVSet,
 		DirEnt: structs.DirEntry{
 			Key:   args.Key,
 			Flags: 0,
@@ -167,19 +166,19 @@ func (s *HTTPServer) KVSPut(resp http.ResponseWriter, req *http.Request, args *s
 			return nil, err
 		}
 		applyReq.DirEnt.ModifyIndex = casVal
-		applyReq.Op = api.KVCAS
+		applyReq.Op = structs.KVCAS
 	}
 
 	// Check for lock acquisition
 	if _, ok := params["acquire"]; ok {
 		applyReq.DirEnt.Session = params.Get("acquire")
-		applyReq.Op = api.KVLock
+		applyReq.Op = structs.KVLock
 	}
 
 	// Check for lock release
 	if _, ok := params["release"]; ok {
 		applyReq.DirEnt.Session = params.Get("release")
-		applyReq.Op = api.KVUnlock
+		applyReq.Op = structs.KVUnlock
 	}
 
 	// Check the content-length
@@ -203,7 +202,7 @@ func (s *HTTPServer) KVSPut(resp http.ResponseWriter, req *http.Request, args *s
 	}
 
 	// Only use the out value if this was a CAS
-	if applyReq.Op == api.KVSet {
+	if applyReq.Op == structs.KVSet {
 		return true, nil
 	}
 	return out, nil
@@ -216,7 +215,7 @@ func (s *HTTPServer) KVSDelete(resp http.ResponseWriter, req *http.Request, args
 	}
 	applyReq := structs.KVSRequest{
 		Datacenter: args.Datacenter,
-		Op:         api.KVDelete,
+		Op:         structs.KVDelete,
 		DirEnt: structs.DirEntry{
 			Key: args.Key,
 		},
@@ -226,7 +225,7 @@ func (s *HTTPServer) KVSDelete(resp http.ResponseWriter, req *http.Request, args
 	// Check for recurse
 	params := req.URL.Query()
 	if _, ok := params["recurse"]; ok {
-		applyReq.Op = api.KVDeleteTree
+		applyReq.Op = structs.KVDeleteTree
 	} else if missingKey(resp, args) {
 		return nil, nil
 	}
@@ -238,7 +237,7 @@ func (s *HTTPServer) KVSDelete(resp http.ResponseWriter, req *http.Request, args
 			return nil, err
 		}
 		applyReq.DirEnt.ModifyIndex = casVal
-		applyReq.Op = api.KVDeleteCAS
+		applyReq.Op = structs.KVDeleteCAS
 	}
 
 	// Make the RPC
@@ -248,7 +247,7 @@ func (s *HTTPServer) KVSDelete(resp http.ResponseWriter, req *http.Request, args
 	}
 
 	// Only use the out value if this was a CAS
-	if applyReq.Op == api.KVDeleteCAS {
+	if applyReq.Op == structs.KVDeleteCAS {
 		return out, nil
 	}
 	return true, nil

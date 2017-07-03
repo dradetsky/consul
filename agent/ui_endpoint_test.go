@@ -13,7 +13,6 @@ import (
 	"testing"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/testutil"
 	"github.com/hashicorp/go-cleanhttp"
 )
@@ -163,15 +162,15 @@ func TestSummarizeServices(t *testing.T) {
 			},
 			Checks: []*structs.HealthCheck{
 				&structs.HealthCheck{
-					Status:      api.HealthPassing,
+					Status:      structs.HealthPassing,
 					ServiceName: "",
 				},
 				&structs.HealthCheck{
-					Status:      api.HealthPassing,
+					Status:      structs.HealthPassing,
 					ServiceName: "web",
 				},
 				&structs.HealthCheck{
-					Status:      api.HealthWarning,
+					Status:      structs.HealthWarning,
 					ServiceName: "api",
 				},
 			},
@@ -186,7 +185,7 @@ func TestSummarizeServices(t *testing.T) {
 			},
 			Checks: []*structs.HealthCheck{
 				&structs.HealthCheck{
-					Status:      api.HealthCritical,
+					Status:      structs.HealthCritical,
 					ServiceName: "web",
 				},
 			},

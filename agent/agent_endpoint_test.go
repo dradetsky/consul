@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/logger"
 	"github.com/hashicorp/consul/testutil/retry"
 	"github.com/hashicorp/consul/types"
@@ -104,7 +103,7 @@ func TestAgent_Checks(t *testing.T) {
 		Node:    a.Config.NodeName,
 		CheckID: "mysql",
 		Name:    "mysql",
-		Status:  api.HealthPassing,
+		Status:  structs.HealthPassing,
 	}
 	a.state.AddCheck(chk1, "")
 
@@ -117,7 +116,7 @@ func TestAgent_Checks(t *testing.T) {
 	if len(val) != 1 {
 		t.Fatalf("bad checks: %v", obj)
 	}
-	if val["mysql"].Status != api.HealthPassing {
+	if val["mysql"].Status != structs.HealthPassing {
 		t.Fatalf("bad check: %v", obj)
 	}
 }
@@ -131,7 +130,7 @@ func TestAgent_Checks_ACLFilter(t *testing.T) {
 		Node:    a.Config.NodeName,
 		CheckID: "mysql",
 		Name:    "mysql",
-		Status:  api.HealthPassing,
+		Status:  structs.HealthPassing,
 	}
 	a.state.AddCheck(chk1, "")
 
@@ -658,7 +657,7 @@ func TestAgent_RegisterCheck(t *testing.T) {
 
 	// By default, checks start in critical state.
 	state := a.state.Checks()[checkID]
-	if state.Status != api.HealthCritical {
+	if state.Status != structs.HealthCritical {
 		t.Fatalf("bad: %v", state)
 	}
 }
@@ -672,7 +671,7 @@ func TestAgent_RegisterCheck_Passing(t *testing.T) {
 	args := &structs.CheckDefinition{
 		Name:   "test",
 		TTL:    15 * time.Second,
-		Status: api.HealthPassing,
+		Status: structs.HealthPassing,
 	}
 	req, _ := http.NewRequest("GET", "/v1/agent/check/register", jsonReader(args))
 	obj, err := a.srv.AgentRegisterCheck(nil, req)
@@ -694,7 +693,7 @@ func TestAgent_RegisterCheck_Passing(t *testing.T) {
 	}
 
 	state := a.state.Checks()[checkID]
-	if state.Status != api.HealthPassing {
+	if state.Status != structs.HealthPassing {
 		t.Fatalf("bad: %v", state)
 	}
 }
@@ -818,7 +817,7 @@ func TestAgent_PassCheck(t *testing.T) {
 
 	// Ensure we have a check mapping
 	state := a.state.Checks()["test"]
-	if state.Status != api.HealthPassing {
+	if state.Status != structs.HealthPassing {
 		t.Fatalf("bad: %v", state)
 	}
 }
@@ -871,7 +870,7 @@ func TestAgent_WarnCheck(t *testing.T) {
 
 	// Ensure we have a check mapping
 	state := a.state.Checks()["test"]
-	if state.Status != api.HealthWarning {
+	if state.Status != structs.HealthWarning {
 		t.Fatalf("bad: %v", state)
 	}
 }
@@ -924,7 +923,7 @@ func TestAgent_FailCheck(t *testing.T) {
 
 	// Ensure we have a check mapping
 	state := a.state.Checks()["test"]
-	if state.Status != api.HealthCritical {
+	if state.Status != structs.HealthCritical {
 		t.Fatalf("bad: %v", state)
 	}
 }
@@ -967,9 +966,9 @@ func TestAgent_UpdateCheck(t *testing.T) {
 	}
 
 	cases := []checkUpdate{
-		checkUpdate{api.HealthPassing, "hello-passing"},
-		checkUpdate{api.HealthCritical, "hello-critical"},
-		checkUpdate{api.HealthWarning, "hello-warning"},
+		checkUpdate{structs.HealthPassing, "hello-passing"},
+		checkUpdate{structs.HealthCritical, "hello-critical"},
+		checkUpdate{structs.HealthWarning, "hello-warning"},
 	}
 
 	for _, c := range cases {
@@ -996,7 +995,7 @@ func TestAgent_UpdateCheck(t *testing.T) {
 
 	t.Run("log output limit", func(t *testing.T) {
 		args := checkUpdate{
-			Status: api.HealthPassing,
+			Status: structs.HealthPassing,
 			Output: strings.Repeat("-= bad -=", 5*CheckBufSize),
 		}
 		req, _ := http.NewRequest("PUT", "/v1/agent/check/update/test", jsonReader(args))
@@ -1016,7 +1015,7 @@ func TestAgent_UpdateCheck(t *testing.T) {
 		// rough check that the output buffer was cut down so this test
 		// isn't super brittle.
 		state := a.state.Checks()["test"]
-		if state.Status != api.HealthPassing || len(state.Output) > 2*CheckBufSize {
+		if state.Status != structs.HealthPassing || len(state.Output) > 2*CheckBufSize {
 			t.Fatalf("bad: %v", state)
 		}
 	})
@@ -1038,7 +1037,7 @@ func TestAgent_UpdateCheck(t *testing.T) {
 	})
 
 	t.Run("bogus verb", func(t *testing.T) {
-		args := checkUpdate{Status: api.HealthPassing}
+		args := checkUpdate{Status: structs.HealthPassing}
 		req, _ := http.NewRequest("POST", "/v1/agent/check/update/test", jsonReader(args))
 		resp := httptest.NewRecorder()
 		obj, err := a.srv.AgentCheckUpdate(resp, req)
@@ -1066,7 +1065,7 @@ func TestAgent_UpdateCheck_ACLDeny(t *testing.T) {
 	}
 
 	t.Run("no token", func(t *testing.T) {
-		args := checkUpdate{api.HealthPassing, "hello-passing"}
+		args := checkUpdate{structs.HealthPassing, "hello-passing"}
 		req, _ := http.NewRequest("PUT", "/v1/agent/check/update/test", jsonReader(args))
 		if _, err := a.srv.AgentCheckUpdate(nil, req); !isPermissionDenied(err) {
 			t.Fatalf("err: %v", err)
@@ -1074,7 +1073,7 @@ func TestAgent_UpdateCheck_ACLDeny(t *testing.T) {
 	})
 
 	t.Run("root token", func(t *testing.T) {
-		args := checkUpdate{api.HealthPassing, "hello-passing"}
+		args := checkUpdate{structs.HealthPassing, "hello-passing"}
 		req, _ := http.NewRequest("PUT", "/v1/agent/check/update/test?token=root", jsonReader(args))
 		if _, err := a.srv.AgentCheckUpdate(nil, req); err != nil {
 			t.Fatalf("err: %v", err)

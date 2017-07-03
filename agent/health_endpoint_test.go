@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/hashicorp/consul/agent/consul/structs"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/testutil/retry"
 	"github.com/hashicorp/serf/coordinate"
 )
@@ -77,7 +76,7 @@ func TestHealthChecksInState_NodeMetaFilter(t *testing.T) {
 		Check: &structs.HealthCheck{
 			Node:   "bar",
 			Name:   "node check",
-			Status: api.HealthCritical,
+			Status: structs.HealthCritical,
 		},
 	}
 	var out struct{}
@@ -116,7 +115,7 @@ func TestHealthChecksInState_DistanceSort(t *testing.T) {
 		Check: &structs.HealthCheck{
 			Node:   "bar",
 			Name:   "node check",
-			Status: api.HealthCritical,
+			Status: structs.HealthCritical,
 		},
 	}
 
@@ -605,7 +604,7 @@ func TestHealthServiceNodes_PassingFilter(t *testing.T) {
 			Node:      a.Config.NodeName,
 			Name:      "consul check",
 			ServiceID: "consul",
-			Status:    api.HealthCritical,
+			Status:    structs.HealthCritical,
 		},
 	}
 
@@ -776,27 +775,27 @@ func TestFilterNonPassing(t *testing.T) {
 		structs.CheckServiceNode{
 			Checks: structs.HealthChecks{
 				&structs.HealthCheck{
-					Status: api.HealthCritical,
+					Status: structs.HealthCritical,
 				},
 				&structs.HealthCheck{
-					Status: api.HealthCritical,
-				},
-			},
-		},
-		structs.CheckServiceNode{
-			Checks: structs.HealthChecks{
-				&structs.HealthCheck{
-					Status: api.HealthCritical,
-				},
-				&structs.HealthCheck{
-					Status: api.HealthCritical,
+					Status: structs.HealthCritical,
 				},
 			},
 		},
 		structs.CheckServiceNode{
 			Checks: structs.HealthChecks{
 				&structs.HealthCheck{
-					Status: api.HealthPassing,
+					Status: structs.HealthCritical,
+				},
+				&structs.HealthCheck{
+					Status: structs.HealthCritical,
+				},
+			},
+		},
+		structs.CheckServiceNode{
+			Checks: structs.HealthChecks{
+				&structs.HealthCheck{
+					Status: structs.HealthPassing,
 				},
 			},
 		},
