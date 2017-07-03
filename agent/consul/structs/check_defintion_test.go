@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/google/gofuzz"
-	"github.com/hashicorp/consul/api"
 	"github.com/mitchellh/reflectwalk"
 )
 
@@ -15,7 +14,7 @@ func TestCheckDefinition_Defaults(t *testing.T) {
 	check := def.HealthCheck("node1")
 
 	// Health checks default to critical state
-	if check.Status != api.HealthCritical {
+	if check.Status != HealthCritical {
 		t.Fatalf("bad: %v", check.Status)
 	}
 }

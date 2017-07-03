@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul/acl"
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/types"
 	"github.com/hashicorp/go-msgpack/codec"
 	"github.com/hashicorp/serf/coordinate"
@@ -88,7 +87,7 @@ const (
 var metaKeyFormat = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`).MatchString
 
 func ValidStatus(s string) bool {
-	return s == api.HealthPassing || s == api.HealthWarning || s == api.HealthCritical
+	return s == HealthPassing || s == HealthWarning || s == HealthCritical
 }
 
 // RPCInfo is used to describe common information about query
@@ -549,8 +548,8 @@ OUTER:
 	for i := 0; i < n; i++ {
 		node := nodes[i]
 		for _, check := range node.Checks {
-			if check.Status == api.HealthCritical ||
-				(onlyPassing && check.Status != api.HealthPassing) {
+			if check.Status == HealthCritical ||
+				(onlyPassing && check.Status != HealthPassing) {
 				nodes[i], nodes[n-1] = nodes[n-1], CheckServiceNode{}
 				n--
 				i--
@@ -646,7 +645,7 @@ type DirEntries []*DirEntry
 // KVSRequest is used to operate on the Key-Value store
 type KVSRequest struct {
 	Datacenter string
-	Op         api.KVOp // Which operation are we performing
+	Op         KVOp     // Which operation are we performing
 	DirEnt     DirEntry // Which directory entry
 	WriteRequest
 }

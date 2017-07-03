@@ -3,7 +3,6 @@ package structs
 import (
 	"time"
 
-	"github.com/hashicorp/consul/api"
 	"github.com/hashicorp/consul/types"
 )
 
@@ -40,7 +39,7 @@ func (c *CheckDefinition) HealthCheck(node string) *HealthCheck {
 		Node:      node,
 		CheckID:   c.ID,
 		Name:      c.Name,
-		Status:    api.HealthCritical,
+		Status:    HealthCritical,
 		Notes:     c.Notes,
 		ServiceID: c.ServiceID,
 	}
